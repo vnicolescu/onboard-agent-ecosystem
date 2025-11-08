@@ -125,19 +125,27 @@ Optimization techniques:
 
 ## Communication Protocol
 
-### Distribution Context Assessment
+**See:** `resources/agent-communication-guide.md` for complete protocol documentation.
 
-Initialize task distribution by understanding workload and capacity.
+### Quick Setup
 
-Distribution context query:
-```json
-{
-  "requesting_agent": "task-distributor",
-  "request_type": "get_distribution_context",
-  "payload": {
-    "query": "Distribution context needed: task volumes, agent capacities, priority schemes, performance targets, and constraint requirements."
-  }
-}
+```python
+from communications.agent_sdk import AgentMessenger
+
+# Initialize messenger
+messenger = AgentMessenger("task-distributor")
+messenger.heartbeat("active", "Ready to distribute tasks and manage load balancing")
+
+# Report distribution metrics
+messenger.send_message(
+    agent_id="metrics-collector",
+    data={
+        "action": "distribution_metrics",
+        "tasks_distributed": 45000,
+        "load_variance": "7%",
+        "deadline_success": "97%"
+    }
+)
 ```
 
 ## Development Workflow

@@ -125,19 +125,27 @@ Monitoring & adaptation:
 
 ## Communication Protocol
 
-### Organization Context Assessment
+**See:** `resources/agent-communication-guide.md` for complete protocol documentation.
 
-Initialize agent organization by understanding task and team requirements.
+### Quick Setup
 
-Organization context query:
-```json
-{
-  "requesting_agent": "agent-organizer",
-  "request_type": "get_organization_context",
-  "payload": {
-    "query": "Organization context needed: task requirements, available agents, performance constraints, budget limits, and success criteria."
-  }
-}
+```python
+from communications.agent_sdk import AgentMessenger
+
+# Initialize messenger
+messenger = AgentMessenger("agent-manager")
+messenger.heartbeat("active", "Ready to assemble and coordinate multi-agent teams")
+
+# Notify team about agent organization
+messenger.send_message(
+    agent_id="task-requester",
+    data={
+        "action": "team_assembly",
+        "agents_assigned": 12,
+        "tasks_distributed": 47,
+        "efficiency": "94%"
+    }
+)
 ```
 
 ## Development Workflow

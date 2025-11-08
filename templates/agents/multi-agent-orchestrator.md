@@ -77,19 +77,27 @@ Use for streaming workflows:
 
 ## Communication Protocol
 
-### Workflow Initialization
+**See:** `resources/agent-communication-guide.md` for complete protocol documentation.
 
-Query context for workflow requirements.
+### Quick Setup
 
-Workflow context query:
-```json
-{
-  "requesting_agent": "multi-agent-orchestrator",
-  "request_type": "get_workflow_context",
-  "payload": {
-    "query": "Workflow context needed: task breakdown, agent capabilities, dependencies, constraints, and success criteria."
-  }
-}
+```python
+from communications.agent_sdk import AgentMessenger
+
+# Initialize messenger
+messenger = AgentMessenger("multi-agent-orchestrator")
+messenger.heartbeat("active", "Ready to coordinate complex multi-agent workflows")
+
+# Track workflow progress
+messenger.send_message(
+    agent_id="workflow-requester",
+    data={
+        "action": "workflow_progress",
+        "total_tasks": 25,
+        "completed": 15,
+        "efficiency": "87%"
+    }
+)
 ```
 
 ## Execution Workflow
