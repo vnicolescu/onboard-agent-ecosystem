@@ -1,8 +1,21 @@
-# Project Onboard Skill
+# Project Onboard - Multi-Agent Ecosystem
 
-**Version:** 1.0
+**Version:** 2.0 (SDK Migration)
 **Author:** Vlad-Alexandru Nicolescu (with Claude's assistance)
-**Status:** In Review
+**Status:** Migrated to Official Anthropic Python Agent SDK
+
+> **🚀 New in v2.0**: Fully refactored to use the official Anthropic Python Agent SDK with MCP tools!
+
+## Migration Notice
+
+**Version 2.0** represents a major architectural upgrade:
+- ✅ **Official SDK**: Now built on `claude-agent-sdk` (Python)
+- ✅ **MCP Tools**: Communication system exposed as Model Context Protocol tools
+- ✅ **Better Architecture**: Subagents defined using `AgentDefinition`
+- ✅ **Cleaner Integration**: Standard MCP protocol for tool access
+- ✅ **All Audit Issues Fixed**: Issues #1-#10 from audit resolved
+
+See `REFACTORING_PLAN.md` and `AUDIT_FIXES_SDK.md` for technical details.
 
 ## What This Does
 
@@ -17,38 +30,81 @@ Transforms any project into a self-organizing multi-agent system with:
 
 ## Installation
 
-### Option 1: Claude Desktop (Recommended)
+### Prerequisites
 
-1. Download the `project-onboard` folder
-2. Open Claude Desktop Settings → Capabilities
-3. Upload as custom skill (as .zip)
-4. Skill will be available system-wide
-
-### Option 2: Claude Code
-
-1. Copy `project-onboard/` to your skills directory:
+1. **Install Claude Code CLI**:
    ```bash
-   cp -r project-onboard /path/to/your/.claude/skills/
+   npm install -g @anthropic-ai/claude-code
    ```
 
-2. Claude Code will auto-discover it
+2. **Install Python SDK**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+   This installs:
+   - `claude-agent-sdk` (Official Anthropic SDK)
+   - Development dependencies (pytest, black, mypy, etc.)
+
+### Setup
+
+1. **Initialize Communication System**:
+   ```bash
+   python -c "from communications.core import CommunicationSystem; CommunicationSystem('.').initialize()"
+   ```
+
+2. **Test MCP Tools**:
+   ```bash
+   python examples/sdk_mcp_tools_example.py
+   ```
 
 ## Quick Start
 
-From your project root:
+### Option 1: Using the SDK (Recommended)
 
-```bash
-# 1. Analyze project
-python /mnt/skills/user/project-onboard/scripts/analyze_project.py > context.json
+```python
+import asyncio
+from claude_agent_sdk import ClaudeSDKClient, ClaudeAgentOptions, create_sdk_mcp_server
+from communications.mcp_tools import ALL_TOOLS, get_all_tool_names
 
-# 2. Review recommendations
-cat context.json
+async def main():
+    # Create MCP server with communication tools
+    comms_server = create_sdk_mcp_server(
+        name="comms",
+        version="1.0.0",
+        tools=ALL_TOOLS
+    )
 
-# 3. Tell Claude to initialize
-"Initialize the project team using the project-onboard skill"
+    # Configure Claude
+    options = ClaudeAgentOptions(
+        mcp_servers={"comms": comms_server},
+        allowed_tools=get_all_tool_names() + ["Read", "Write", "Bash"],
+        system_prompt={
+            "type": "preset",
+            "preset": "claude_code",
+            "append": "You have access to the Onboard communication system..."
+        }
+    )
+
+    # Start session
+    async with ClaudeSDKClient(options=options) as client:
+        await client.query("Initialize the agent ecosystem")
+        async for message in client.receive_response():
+            # Process messages
+            pass
+
+asyncio.run(main())
 ```
 
-Claude will then guide you through the complete onboarding workflow.
+### Option 2: Using Skills (Legacy)
+
+Skills can guide Claude's behavior:
+```bash
+# Skills are in .claude/skills/
+# Claude Code auto-discovers them
+```
+
+See `examples/sdk_mcp_tools_example.py` for a complete working example.
 
 ## What Gets Created
 

@@ -1,0 +1,25 @@
+# Onboard Agent Ecosystem - Python Dependencies
+
+# Official Anthropic Claude Agent SDK
+claude-agent-sdk>=0.1.0
+
+# Core dependencies (already included with SDK, but listed for reference)
+# - asyncio (Python stdlib)
+# - typing (Python stdlib)
+
+# Database
+# SQLite3 is included in Python stdlib
+
+# Development dependencies (optional)
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+black>=23.0.0
+mypy>=1.5.0
+ruff>=0.0.285
+
+# Documentation (optional)
+mkdocs>=1.5.0
+mkdocs-material>=9.2.0
+
+# Testing with Claude Code CLI
+# Requires: npm install -g @anthropic-ai/claude-code
