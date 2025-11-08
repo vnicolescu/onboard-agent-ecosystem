@@ -1,0 +1,48 @@
+{
+  "vote_id": "vote-3d3d2ffc",
+  "topic": "Use TypeScript for new components?",
+  "description": "Use TypeScript for new components?",
+  "options": [
+    "yes",
+    "no",
+    "defer"
+  ],
+  "mechanism": "simple_majority",
+  "proposed_by": "frontend-dev-01",
+  "proposed_at": "2025-11-08T21:07:14.609202Z",
+  "deadline": "2025-11-08T22:07:14.609222Z",
+  "eligible_voters": [
+    "backend-dev-01",
+    "context-manager",
+    "frontend-dev-01"
+  ],
+  "votes_cast": {
+    "frontend-dev-01": {
+      "choice": "yes",
+      "reasoning": "Vote from frontend-dev-01",
+      "timestamp": "2025-11-08T21:07:14.611057Z"
+    },
+    "backend-dev-01": {
+      "choice": "yes",
+      "reasoning": "Vote from backend-dev-01",
+      "timestamp": "2025-11-08T21:07:14.611799Z"
+    },
+    "context-manager": {
+      "choice": "defer",
+      "reasoning": "Vote from context-manager",
+      "timestamp": "2025-11-08T21:07:14.612376Z"
+    }
+  },
+  "status": "closed",
+  "result": {
+    "outcome": "yes",
+    "tally": {
+      "yes": 2,
+      "no": 0,
+      "defer": 1
+    },
+    "total_votes": 3,
+    "mechanism": "simple_majority"
+  },
+  "closed_at": "2025-11-08T21:07:14.613397Z"
+}
