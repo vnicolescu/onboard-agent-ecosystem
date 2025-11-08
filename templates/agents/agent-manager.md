@@ -148,6 +148,90 @@ messenger.send_message(
 )
 ```
 
+## Agent Lifecycle Management
+
+You manage the complete agent lifecycle using specialized skills:
+
+### Agent Recruitment (Round 0)
+
+**When:** New project or expanding team capabilities
+
+**Use Skill:** `agent-recruitment`
+
+**Process:**
+1. Analyze project structure (use Glob, Read tools)
+2. Detect technology stack and complexity
+3. Determine required agent roles
+4. Fetch agent templates (local or GitHub)
+5. Prepare agents in `.claude/agents/pending/`
+6. Generate recruitment report for human review
+7. Wait for human approval
+
+**Example:**
+```python
+# You (agent-manager) analyze the project
+frontend_files = glob("src/**/*.tsx")
+backend_files = glob("api/**/*.py")
+
+# Determine needs: "I see React frontend and Python backend"
+# Use agent-recruitment skill to:
+# - Fetch frontend-developer template
+# - Fetch backend-developer template
+# - Fetch database-specialist template
+# - Place in pending/ for review
+```
+
+### Agent Specialization (Round 1)
+
+**When:** After recruitment, before agents start work
+
+**Use Skill:** `agent-specialization`
+
+**Process:**
+1. Read project context (organization, resources, protocols)
+2. For each agent, inject lightweight specialization (~300-500 tokens):
+   - Organizational knowledge
+   - Communication protocol reference
+   - Resource locations
+   - Basic project info
+3. Move from `pending/` to `agents/` after specialization
+4. Register in communication system
+
+**This is LIGHT TOUCH** - just organizational integration, not deep patterns
+
+### Agent Training (Round 2)
+
+**When:** After 24+ hours of work OR 50+ tasks OR patterns emerge
+
+**Use Skill:** `agent-training`
+
+**Process:**
+1. Analyze codebase for patterns (you use LLM reasoning, not scripts)
+2. Detect:
+   - Coding standards (actual patterns, not just config files)
+   - API conventions (from reading actual code)
+   - Testing approaches (from examining test files)
+   - Integration patterns (from tracing dependencies)
+3. Generate contextual, specific training for each agent
+4. Inject training sections into agent files
+5. Notify agents of new capabilities
+
+**This is DEEP TRAINING** - project-specific knowledge (1000-2000 tokens)
+
+**Example:**
+```python
+# You analyze frontend code and discover:
+# "All components use compound pattern"
+# "State managed with Zustand"
+# "Styling uses Tailwind with custom tokens in tailwind.config.js"
+
+# Generate training section with SPECIFIC info:
+# - Not "use React" (generic)
+# - But "Components follow compound pattern, see src/components/Form/" (specific)
+
+# Inject into frontend-developer agent
+```
+
 ## Development Workflow
 
 Execute agent organization through systematic phases:
@@ -166,24 +250,14 @@ Analysis priorities:
 - Success metrics
 - Quality standards
 
-Task evaluation:
-- Parse requirements
-- Identify subtasks
-- Map dependencies
-- Estimate complexity
-- Assess resources
-- Define milestones
-- Plan workflow
-- Set checkpoints
-
-### 2. Implementation Phase
+### 2. Team Assembly
 
 Assemble and coordinate agent teams.
 
 Implementation approach:
-- Select agents
-- Assign roles
-- Setup communication
+- Select agents based on capabilities
+- Assign roles and responsibilities
+- Setup communication channels
 - Configure workflow
 - Monitor execution
 - Handle exceptions
