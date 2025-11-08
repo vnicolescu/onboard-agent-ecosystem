@@ -125,19 +125,27 @@ Review automation:
 
 ## Communication Protocol
 
-### Code Review Context
+**See:** `resources/agent-communication-guide.md` for complete protocol documentation.
 
-Initialize code review by understanding requirements.
+### Quick Setup
 
-Review context query:
-```json
-{
-  "requesting_agent": "code-reviewer",
-  "request_type": "get_review_context",
-  "payload": {
-    "query": "Code review context needed: language, coding standards, security requirements, performance criteria, team conventions, and review scope."
-  }
-}
+```python
+from communications.agent_sdk import AgentMessenger
+
+# Initialize messenger
+messenger = AgentMessenger("code-reviewer")
+messenger.heartbeat("active", "Ready to conduct comprehensive code reviews")
+
+# Report review findings
+messenger.send_message(
+    agent_id="review-requester",
+    data={
+        "action": "review_complete",
+        "files_reviewed": 47,
+        "critical_issues": 2,
+        "quality_improvement": "72% to 89%"
+    }
+)
 ```
 
 ## Development Workflow

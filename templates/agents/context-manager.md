@@ -125,18 +125,63 @@ Query optimization:
 
 ## Communication Protocol
 
-### Context System Assessment
+**See:** `resources/agent-communication-guide.md` for complete protocol documentation.
 
-Initialize context management by understanding system requirements.
+### Quick Setup
 
-Context system query:
-```json
+```python
+from communications.agent_sdk import AgentMessenger
+
+# Initialize messenger
+messenger = AgentMessenger("context-manager")
+messenger.heartbeat("active", "Ready to serve context queries")
+```
+
+### Handling Context Queries
+
+As context-manager, you'll receive `context.query` messages from other agents:
+
+```python
+# Poll for queries
+messages = messenger.receive(limit=10, message_type="context.query")
+
+for msg in messages:
+    if messenger.claim(msg['id']):
+        try:
+            # Extract query
+            query = msg['payload']['query']
+
+            # Retrieve context (use your expertise)
+            context_data = retrieve_context(query)
+
+            # Send response
+            messenger.reply(msg, {"context": context_data})
+
+            # Mark complete
+            messenger.complete(msg['id'])
+        except Exception as e:
+            messenger.complete(msg['id'], error=str(e))
+```
+
+### Context Response Format
+
+Always respond with structured context:
+
+```python
 {
-  "requesting_agent": "context-manager",
-  "request_type": "get_context_requirements",
-  "payload": {
-    "query": "Context requirements needed: data types, access patterns, consistency needs, performance targets, and compliance requirements."
-  }
+    "context": {
+        "framework": "React 18",
+        "state_management": "Zustand",
+        "styling": "Tailwind CSS",
+        "conventions": {
+            "component_naming": "PascalCase",
+            "file_structure": "feature-based"
+        },
+        "resources": {
+            "docs": ".claude/docs/architecture.md",
+            "examples": "src/components/examples/"
+        }
+    }
 }
 ```
 

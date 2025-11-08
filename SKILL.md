@@ -51,10 +51,17 @@ Review output for:
 
 Initialize systems:
 ```bash
-# Communication system
-python scripts/setup_communication.py .
+# Communication system (NEW)
+python -c "
+from communications.core import CommunicationSystem
+comm = CommunicationSystem('.')
+result = comm.initialize()
+print('✓ Communication system initialized')
+print(f'Database: {result[\"db_path\"]}')
+print(f'Artifacts: {result[\"artifacts_dir\"]}')
+"
 
-# Job board  
+# Job board
 python scripts/create_job_board.py init
 
 # Audit trail
@@ -64,6 +71,9 @@ touch .claude/audit-trail.jsonl
 
 Verify:
 ```bash
+ls .claude/communications/
+# Should see: messages.db, protocol_version.txt
+
 ls .claude/
 # Should see: communications/, job-board.json, audit-trail.jsonl
 ```
@@ -102,17 +112,23 @@ mv .claude/agents/pending/* .claude/agents/
 
 Register agents in communication system:
 ```python
-import sys
 from pathlib import Path
-sys.path.insert(0, 'scripts/')
-from setup_communication import CommunicationSystem
+from communications.core import CommunicationSystem
 
 comm = CommunicationSystem('.')
 
+# Auto-subscribe agents to default channels
 for agent_file in Path('.claude/agents').glob('*.md'):
     agent_name = agent_file.stem
-    agent_id = comm.register_agent(agent_name, agent_name, ['specialized_work'])
-    print(f"Registered: {agent_name} → {agent_id}")
+
+    # Subscribe to channels
+    comm.subscribe_to_channel(agent_name, "general")
+    comm.subscribe_to_channel(agent_name, "technical")
+
+    # Register with heartbeat
+    comm.send_heartbeat(agent_name, "registered", "Ready for tasks")
+
+    print(f"Registered: {agent_name}")
 ```
 
 ---
@@ -146,34 +162,48 @@ for task in tasks:
 
 Broadcast coordination protocol:
 ```python
-protocol = """
-## Team Coordination Protocol
+from communications.core import CommunicationSystem
 
-**Before work:**
-1. Check messages in .claude/communications/
-2. Query context-manager for project state
-3. Review job-board.json for tasks
+comm = CommunicationSystem('.')
 
-**When working:**
-1. Claim task in job board
-2. Update status as you progress
-3. Log decisions to audit trail
-4. Communicate blockers immediately
+protocol_msg = {
+    "welcome": "Team initialized successfully!",
+    "protocol": {
+        "before_work": [
+            "Use AgentMessenger to receive messages",
+            "Query context-manager for project state",
+            "Check job board for available tasks"
+        ],
+        "during_work": [
+            "Claim task from job board",
+            "Send heartbeats regularly",
+            "Log decisions to audit trail",
+            "Broadcast blockers immediately"
+        ],
+        "escalation": {
+            "conflicts": "Human decision required",
+            "security": "Human review required",
+            "architecture": "Use voting protocol"
+        }
+    },
+    "resources": {
+        "communication": "resources/agent-communication-guide.md",
+        "voting": "resources/voting-protocols.md",
+        "specialization": "resources/specialization-guidelines.md",
+        "skills": "resources/skill-writing-guide.md"
+    }
+}
 
-**Escalation:**
-- Conflicts → Human decision
-- Security → Human review
-- Architecture → Voting protocol
+# Broadcast to all agents
+comm.send_message(
+    from_agent="system",
+    message_type="system.welcome",
+    payload=protocol_msg,
+    channel="general",
+    priority=9
+)
 
-Resources:
-- Voting: skill resources/voting-protocols.md
-- Specialization: skill resources/specialization-guidelines.md
-- Skill writing: skill resources/skill-writing-guide.md
-
-Let's build! 🚀
-"""
-
-comm.send_message('system', '#general', protocol, priority='normal')
+print("✓ Team briefing broadcast to all agents")
 ```
 
 ---
